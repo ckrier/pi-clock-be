@@ -2,7 +2,7 @@ from flask import Flask
 from flask_cors import CORS
 from .db import db
 
-from .controllers.alarm_controller import alarm_controller
+from .alarms.alarm_controller import alarm_controller
 
 def create_app():
     app = Flask(__name__)

@@ -1,8 +1,7 @@
 from http import HTTPStatus
-import json
 from flask import Blueprint, jsonify, request, make_response
 from ..db import db
-from ..models.alarm import Alarm
+from alarm import Alarm
 
 alarm_controller = Blueprint('alarms', __name__, url_prefix='/alarms')
 
