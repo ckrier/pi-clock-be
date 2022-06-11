@@ -1,5 +1,7 @@
 from uuid import uuid4
+from sqlalchemy import orm, event
 from ..db import db
+
 
 class Alarm(db.Model):
     __tablename__ = 'alarms'
@@ -26,10 +28,14 @@ class Alarm(db.Model):
         nullable=False
     )
 
-    schedule = db.Column(
+    # don't use me. I'm only public to avoid inconveniences with the ORM event listeners
+    internal_schedule = db.Column(
+        'schedule',
         db.Text,
         nullable=True
     )
+
+    schedule = None
 
     def __init__(self, id, hour, minute, schedule, enabled=False) -> None:
         super().__init__()
@@ -42,18 +48,24 @@ class Alarm(db.Model):
         self.hour = hour
         self.minute = minute
         self.enabled = enabled
+        self.schedule = schedule
 
         if schedule is not None:
-            self.schedule = ','.join(schedule)
+            self.internal_schedule = ','.join(schedule)
 
     def toResponse(self):
         return {
             "id": self.id,
             "hour": self.hour,
             "minute": self.minute,
-            "schedule": self.schedule if self.schedule is None else self.schedule.split(','),
+            "schedule": self.schedule,
             "enabled": self.enabled
         }
+
+    @orm.reconstructor
+    def __reconstruct__(self):
+        if self.internal_schedule is not None:
+            self.schedule = self.internal_schedule.split(',')
 
     def __eq__(self, other):
         return self.hour == other.hour and self.minute == other.minute
@@ -63,7 +75,7 @@ class Alarm(db.Model):
 
     def __lt__(self, other):
         return self.hour <= other.hour and self.minute < other.minute
-    
+
     def __le__(self, other):
         return self.hour <= other.hour and self.minute <= other.minute
 
@@ -73,4 +85,17 @@ class Alarm(db.Model):
     def __ge__(self, other):
         return self.hour >= other.hour and self.minute > other.minute
 
-    
+
+def decompressSchedule(target, context):
+    if target.internal_schedule is not None:
+        target.schedule = target.internal_schedule.split(',')
+
+
+def compressSchedule(mapper, connection, target):
+    if target.schedule is not None:
+        target.internal_schedule = ','.join(target.schedule)
+
+
+event.listen(Alarm, 'before_insert', compressSchedule)
+event.listen(Alarm, 'before_update', compressSchedule)
+event.listen(Alarm, 'load', decompressSchedule)
