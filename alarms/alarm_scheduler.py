@@ -5,6 +5,7 @@ from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 from apscheduler.executors.pool import ThreadPoolExecutor, ProcessPoolExecutor
 from apscheduler.triggers.cron import CronTrigger
 
+from ..sounds.spotify_playback_client import play
 from ..config import SQLALCHEMY_DATABASE_URI
 
 
@@ -42,7 +43,7 @@ class AlarmScheduler:
 
         if alarm.enabled:
             self.__scheduler.add_job(
-                func=fu,
+                func=play,
                 trigger=self.__create_cron_trigger__(alarm),
                 id=alarm.id,
                 replace_existing=True)
