@@ -1,4 +1,5 @@
 from os import environ
+from pprint import pprint
 from spotipy import Spotify
 from spotipy.oauth2 import SpotifyOAuth
 
@@ -24,7 +25,19 @@ def play():
 
 def pause():
     client = __create_client__()
-    client.pause_playback(SPOTIFY_DEVICE_ID)
+
+    if (is_playing(client)):
+        client.pause_playback(SPOTIFY_DEVICE_ID)
+
+
+def is_playing(client):
+    if (client is None):
+        client = __create_client__()
+
+    playback = client.current_playback()
+    return (playback is not None
+            and playback['is_playing']
+            and playback['device']['id'] == SPOTIFY_DEVICE_ID)
 
 
 def __create_client__():

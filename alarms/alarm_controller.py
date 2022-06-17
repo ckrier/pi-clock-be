@@ -5,7 +5,6 @@ from ..db import db
 from .alarm import Alarm
 from .alarm_scheduler import AlarmScheduler
 
-# trailing slash is important for firefox for unknown reason
 alarm_controller = Blueprint('alarms', __name__, url_prefix='/alarms')
 alarm_scheduler = AlarmScheduler()
 
