@@ -74,16 +74,21 @@ class Alarm(db.Model):
         return self.hour != other.hour or self.minute != other.minute
 
     def __lt__(self, other):
-        return self.hour <= other.hour and self.minute < other.minute
+        if self.hour < other.hour:
+            return True
+        elif self.hour == other.hour and self.minute < other.minute:
+            return True
+        else:
+            return False
 
     def __le__(self, other):
-        return self.hour <= other.hour and self.minute <= other.minute
+        return self.__lt__(other) or self.__eq__(other)
 
     def __gt__(self, other):
-        return self.hour >= other.hour and self.minute > other.minute
+        return not self.__lt__(other)
 
     def __ge__(self, other):
-        return self.hour >= other.hour and self.minute > other.minute
+        return self.__gt__(other) or self.__eq__(other)
 
 
 def decompressSchedule(target, context):
