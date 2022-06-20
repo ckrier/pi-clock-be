@@ -99,6 +99,8 @@ def decompressSchedule(target, context):
 def compressSchedule(mapper, connection, target):
     if target.schedule is not None:
         target.internal_schedule = ','.join(target.schedule)
+    else:
+        target.internal_schedule = None
 
 
 event.listen(Alarm, 'before_insert', compressSchedule)
