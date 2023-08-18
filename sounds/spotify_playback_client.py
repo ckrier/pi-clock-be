@@ -14,9 +14,6 @@ SPOTIFY_REDIRECT_URI = environ['SPOTIFY_REDIRECT_URI']
 SPOTIFY_AUTH_SCOPES = ['user-modify-playback-state', 'user-read-playback-state',
                        'playlist-read-collaborative', 'playlist-read-private']
 
-# device id to be used for playback
-SPOTIFY_DEVICE_ID = environ['SPOTIFY_DEVICE_ID']
-
 _auth_manager = SpotifyOAuth(
     SPOTIFY_CLIENT_ID,
     SPOTIFY_CLIENT_SECRET,
@@ -46,15 +43,19 @@ def play():
 
     client = _spotify_client
 
-    client.shuffle(True, SPOTIFY_DEVICE_ID)
-    client.start_playback(SPOTIFY_DEVICE_ID, playlist_uri)
+    piclockId = get_device_id()
+    if (piclockId is not None):
+        client.shuffle(True, piclockId)
+        client.start_playback(piclockId, playlist_uri)
+    else:
+        print("Could not find device pi-clock")
 
 
 def pause():
     client = _spotify_client
 
     if (is_playing(client)):
-        client.pause_playback(SPOTIFY_DEVICE_ID)
+        client.pause_playback(get_device_id())
 
 
 def is_playing(client):
@@ -64,4 +65,11 @@ def is_playing(client):
     playback = client.current_playback()
     return (playback is not None
             and playback['is_playing']
-            and playback['device']['id'] == SPOTIFY_DEVICE_ID)
+            and playback['device']['name'] == 'pi-clock')
+
+
+def get_device_id():
+    client = _spotify_client
+    devices = client.devices()['devices']
+    return next(filter(lambda device: 'pi-clock' ==
+                       device['name'], devices), None)['id']
