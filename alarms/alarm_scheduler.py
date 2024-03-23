@@ -5,7 +5,7 @@ from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 from apscheduler.executors.pool import ThreadPoolExecutor, ProcessPoolExecutor
 from apscheduler.triggers.cron import CronTrigger
 
-from ..sounds.spotify_playback_client import play
+from ..sounds.file_playback_client import play
 from ..config import SQLALCHEMY_DATABASE_URI
 
 

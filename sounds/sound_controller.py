@@ -1,7 +1,7 @@
 from http import HTTPStatus
-from flask import Blueprint, jsonify, request, redirect
+from flask import Blueprint, request, redirect
 
-from .spotify_playback_client import pause, play, login
+from .file_playback_client import pause, play, login
 
 sound_controller = Blueprint('sounds', __name__, url_prefix='/sounds')
 
