@@ -1,16 +1,14 @@
-from time import time
-
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 from apscheduler.executors.pool import ThreadPoolExecutor, ProcessPoolExecutor
 from apscheduler.triggers.cron import CronTrigger
 
-from ..sounds.file_playback_client import play
+from ..sounds.file_playback_client import FilePlaybackClient
 from ..config import SQLALCHEMY_DATABASE_URI
 
 
-def fu():
-    print("Alarm Triggered")
+def __play_sound__():
+    FilePlaybackClient().play()
 
 
 class AlarmScheduler:
@@ -30,6 +28,11 @@ class AlarmScheduler:
 
     __scheduler = None
 
+    def __new__(cls):
+        if not hasattr(cls, 'instance'):
+            cls.instance = super(AlarmScheduler, cls).__new__(cls)
+        return cls.instance
+
     def __init__(self):
         scheduler = BackgroundScheduler(
             jobstores=self.__jobstores, executors=self.__executors, job_defaults=self.__job_defaults)
@@ -43,7 +46,7 @@ class AlarmScheduler:
 
         if alarm.enabled:
             self.__scheduler.add_job(
-                func=play,
+                func=__play_sound__,
                 trigger=self.__create_cron_trigger__(alarm),
                 id=alarm.id,
                 replace_existing=True)
