@@ -1,15 +1,18 @@
+from datetime import date
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
+from apscheduler.events import EVENT_JOB_EXECUTED, EVENT_JOB_ERROR
 from apscheduler.executors.pool import ThreadPoolExecutor, ProcessPoolExecutor
 from apscheduler.triggers.cron import CronTrigger
 
-from ..sounds.file_playback_client import FilePlaybackClient
+from .alarm_callback import alarm_callback
 from ..config import SQLALCHEMY_DATABASE_URI
 
-
-def __play_sound__():
-    FilePlaybackClient().play()
-
+def job_listener(event):
+    if event.exception:
+        print('The job failed', event.exception, event.traceback)
+    else:
+        print('The job worked :)', event)
 
 class AlarmScheduler:
     __jobstores = {
@@ -23,7 +26,8 @@ class AlarmScheduler:
 
     __job_defaults = {
         'coalesce': False,
-        'max_instances': 3
+        'max_instances': 3,
+        'misfire_grace_time': 5
     }
 
     __scheduler = None
@@ -36,6 +40,7 @@ class AlarmScheduler:
     def __init__(self):
         scheduler = BackgroundScheduler(
             jobstores=self.__jobstores, executors=self.__executors, job_defaults=self.__job_defaults)
+        scheduler.add_listener(job_listener, EVENT_JOB_EXECUTED | EVENT_JOB_ERROR)
 
         scheduler.start()
         self.__scheduler = scheduler
@@ -46,7 +51,7 @@ class AlarmScheduler:
 
         if alarm.enabled:
             self.__scheduler.add_job(
-                func=__play_sound__,
+                func=alarm_callback,
                 trigger=self.__create_cron_trigger__(alarm),
                 id=alarm.id,
                 replace_existing=True)
