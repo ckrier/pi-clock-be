@@ -1,3 +1,6 @@
+# Resources folder
+resources/*
+
 # Sqlite db
 alarm-app-db.db
 
