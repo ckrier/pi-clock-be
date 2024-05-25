@@ -27,7 +27,7 @@ class FilePlaybackClient:
         self.__player.stop()
 
     def is_playing(self):
-        self.__player.is_playing()
+        return self.__player.is_playing()
 
     def set_sound(self, sound):
         if sound is not None:
@@ -39,4 +39,6 @@ class FilePlaybackClient:
         elif amount < 0:
             amount = 0
 
-        self.__player.audio_set_volume(amount)
+        media_player = self.__player.get_media_player()
+        media_player.audio_set_volume(amount)
+        media_player.release()
