@@ -14,7 +14,7 @@ def post_alarm():
     body = request.get_json(True)
     print(body)
     alarm = Alarm(None, body.get('hour', 0), body.get(
-        'minute', 0), body.get('schedule', None))
+        'minute', 0), body.get('schedule', None), fadeInDuration=body.get('fadeInDuration', 0))
 
     db.session.add(alarm)
     db.session.commit()
@@ -68,6 +68,7 @@ def update_alarm(alarm_id):
     alarm.minute = body.get('minute', 0)
     alarm.enabled = body.get('enabled', False)
     alarm.schedule = body.get('schedule', None)
+    alarm.fadeInDuration = body.get('fadeInDuration', 0)
 
     db.session.commit()
     alarm_scheduler.schedule(alarm)

@@ -28,6 +28,9 @@ class Alarm(db.Model):
         nullable=False
     )
 
+    # the amount of time it takes for an alarm to reach full volume in seconds
+    fadeInDuration = db.Column(db.Integer, nullable=False)
+
     # don't use me. I'm only public to avoid inconveniences with the ORM event listeners
     internal_schedule = db.Column(
         'schedule',
@@ -37,7 +40,7 @@ class Alarm(db.Model):
 
     schedule = None
 
-    def __init__(self, id, hour, minute, schedule, enabled=False) -> None:
+    def __init__(self, id: str, hour: int, minute: int, schedule: str, enabled=False, fadeInDuration=0) -> None:
         super().__init__()
 
         if id is None:
@@ -49,6 +52,7 @@ class Alarm(db.Model):
         self.minute = minute
         self.enabled = enabled
         self.schedule = schedule
+        self.fadeInDuration = fadeInDuration
 
         if schedule is not None:
             self.internal_schedule = ','.join(schedule)
@@ -59,7 +63,8 @@ class Alarm(db.Model):
             "hour": self.hour,
             "minute": self.minute,
             "schedule": self.schedule,
-            "enabled": self.enabled
+            "enabled": self.enabled,
+            "fadeInDuration": self.fadeInDuration
         }
 
     @orm.reconstructor
