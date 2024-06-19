@@ -1,3 +1,9 @@
+# vscode config
+.vscode/
+
+# Mac files
+*.DS_Store
+
 # Resources folder
 resources/*
 
