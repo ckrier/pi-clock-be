@@ -28,7 +28,7 @@ class Alarm(db.Model):
         nullable=False
     )
 
-    # the amount of time it takes for an alarm to reach full volume in seconds
+    # the amount of time it takes for an alarm to reach full volume in minutes
     fadeInDuration = db.Column(db.Integer, nullable=False)
 
     # don't use me. I'm only public to avoid inconveniences with the ORM event listeners

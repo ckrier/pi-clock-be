@@ -1,5 +1,6 @@
 from flask import Flask
 from flask_cors import CORS
+import logging
 from .db import db
 
 from .alarms.alarm_controller import alarm_controller
@@ -14,6 +15,7 @@ def create_app():
     app.register_blueprint(alarm_controller)
     app.register_blueprint(sound_controller)
 
+    db.app = app
     db.init_app(app)
     db.create_all(app=app)
 
